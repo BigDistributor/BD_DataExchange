@@ -21,6 +21,7 @@ public class S3ClientInstance {
     }
 
     public static S3ClientInstance init(AWSCredentials credentials, Regions region) {
+
         AmazonS3 s3client = AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))

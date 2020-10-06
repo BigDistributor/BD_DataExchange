@@ -1,37 +1,42 @@
 package com.bigdistributer.dataexchange.s3.test;
 
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.services.s3.transfer.Upload;
 import com.bigdistributer.dataexchange.s3.model.AWSCredentialInstance;
 import com.bigdistributer.dataexchange.s3.model.JobID;
 import com.bigdistributer.dataexchange.s3.model.S3ClientInstance;
 import com.bigdistributer.dataexchange.utils.DEFAULT;
 
 import java.io.File;
+import java.io.IOException;
 
-public class UploadFile {
-    private final static String TEST_FILE = "/Users/Marwan/Desktop/BigDistributor/test_files/file.tif";
-    private final static String TEST_N5 = "/Users/Marwan/Desktop/BigDistributor/test_files/file.n5";
+public class UploadFolder {
+    private final static String TEST_N5 = "/Users/Marwan/Desktop/BigDistributer/test_files/dataset.n5";
+    private final static String id = "2020-10-05-2eef10e2307f412cb0d0a522717ba7ec";
 
 
-    public static void main(String[] args) throws IllegalAccessException, InterruptedException {
+    public static void main(String[] args) throws IllegalAccessException, InterruptedException, IOException {
+        JobID.set(id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
         S3ClientInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1);
 
-        S3ClientInstance.get().createBucket(JobID.get());
+//        S3ClientInstance.get().createBucket(JobID.get());
 
-//        BucketManager manager = new BucketManager(S3ClientInstance.get(), bucket_name).create();
-//        manager.upload(new File(TEST_FILE));
         TransferManager tm = TransferManagerBuilder.standard().withS3Client(S3ClientInstance.get()).build();
-        File file = new File(TEST_FILE) ;
+        File file = new File(TEST_N5);
 
-        Upload upload = tm.upload(JobID.get(),file.getName(),file);
+        if (!file.exists())
+            throw new IOException(file.getAbsolutePath()+" not exist ! ");
+        if (!file.isDirectory())
+            throw new IOException(file.getAbsolutePath()+" Not folder ! ");
+
+        MultipleFileUpload upload = tm.uploadDirectory(JobID.get(), "", file, true);
 
         System.out.println("Started!");
-//        upload.waitForCompletion();
+        upload.waitForCompletion();
 //        while (!upload.isDone()){
 //            System.out.print("\r progress : "+ upload.getProgress().getBytesTransferred());
 ////            upload.wait(1000);
