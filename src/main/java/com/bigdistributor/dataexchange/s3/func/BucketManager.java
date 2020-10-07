@@ -1,9 +1,9 @@
-package com.bigdistributer.dataexchange.s3.func;
+package com.bigdistributor.dataexchange.s3.func;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.bigdistributer.dataexchange.utils.log.Log;
+import com.bigdistributor.dataexchange.utils.log.Log;
 
 import java.io.File;
 import java.io.IOException;

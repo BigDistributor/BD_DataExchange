@@ -1,4 +1,4 @@
-package com.bigdistributer.dataexchange.s3.model;
+package com.bigdistributor.dataexchange.s3.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

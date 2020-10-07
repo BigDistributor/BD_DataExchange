@@ -1,13 +1,13 @@
-package com.bigdistributer.dataexchange.s3.test;
+package com.bigdistributor.dataexchange.s3.test;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.bigdistributer.dataexchange.s3.model.AWSCredentialInstance;
-import com.bigdistributer.dataexchange.s3.model.JobID;
-import com.bigdistributer.dataexchange.s3.model.S3ClientInstance;
-import com.bigdistributer.dataexchange.utils.DEFAULT;
+import com.bigdistributor.dataexchange.s3.model.AWSCredentialInstance;
+import com.bigdistributor.dataexchange.s3.model.JobID;
+import com.bigdistributor.dataexchange.s3.model.S3ClientInstance;
+import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
-package com.bigdistributer.dataexchange.utils.readfile;
+package com.bigdistributor.dataexchange.utils.readfile;
 
-import com.bigdistributer.dataexchange.utils.DEFAULT;
+import com.bigdistributor.dataexchange.utils.DEFAULT;
 import com.google.common.base.Joiner;
 
 import java.io.BufferedReader;

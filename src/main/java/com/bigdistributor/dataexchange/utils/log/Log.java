@@ -1,4 +1,4 @@
-package com.bigdistributer.dataexchange.utils.log;
+package com.bigdistributor.dataexchange.utils.log;
 
 
 import org.apache.log4j.Level;

@@ -1,9 +1,9 @@
-package com.bigdistributer.dataexchange.s3.func;
+package com.bigdistributor.dataexchange.s3.func;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.bigdistributer.dataexchange.utils.DEFAULT;
-import com.bigdistributer.dataexchange.utils.readfile.CSVReader;
+import com.bigdistributor.dataexchange.utils.DEFAULT;
+import com.bigdistributor.dataexchange.utils.readfile.CSVReader;
 
 import java.util.List;
 import java.util.Map;
