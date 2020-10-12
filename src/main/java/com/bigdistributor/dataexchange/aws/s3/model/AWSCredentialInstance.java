@@ -1,7 +1,7 @@
-package com.bigdistributor.dataexchange.s3.model;
+package com.bigdistributor.dataexchange.aws.s3.model;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.bigdistributor.dataexchange.s3.func.AWSCredentialsReader;
+import com.bigdistributor.dataexchange.aws.s3.func.AWSCredentialsReader;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 public class AWSCredentialInstance {
@@ -13,7 +13,7 @@ public class AWSCredentialInstance {
 
     public static synchronized AWSCredentials get() throws IllegalAccessException {
         if (instance == null) {
-           throw new IllegalAccessException("Init credential before!");
+            throw new IllegalAccessException("Init credential before!");
         }
         return instance;
     }
@@ -24,12 +24,7 @@ public class AWSCredentialInstance {
         return new AWSCredentialInstance(credentials);
     }
 
-//    private static void defaultInit() {
-//        init(DEFAULT.AWS_CREDENTIALS_PATH);
-//    }
-
     public static void main(String[] args) throws IllegalAccessException {
-//        AWSCredentials credentials = AWSCredentialSingleton.get();
         AWSCredentials credentials = AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH).get();
         System.out.println("key: " + credentials.getAWSAccessKeyId());
     }

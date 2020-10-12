@@ -1,4 +1,4 @@
-package com.bigdistributor.dataexchange.s3.func;
+package com.bigdistributor.dataexchange.aws.s3.func;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;

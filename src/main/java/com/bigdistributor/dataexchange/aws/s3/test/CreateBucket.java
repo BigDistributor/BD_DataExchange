@@ -1,10 +1,10 @@
-package com.bigdistributor.dataexchange.s3.test;
+package com.bigdistributor.dataexchange.aws.s3.test;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.model.Bucket;
-import com.bigdistributor.dataexchange.s3.model.AWSCredentialInstance;
-import com.bigdistributor.dataexchange.s3.model.JobID;
-import com.bigdistributor.dataexchange.s3.model.S3ClientInstance;
+import com.bigdistributor.dataexchange.aws.s3.model.AWSCredentialInstance;
+import com.bigdistributor.dataexchange.job.model.JobID;
+import com.bigdistributor.dataexchange.aws.s3.model.S3ClientInstance;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 import java.util.List;
