@@ -43,17 +43,18 @@ public class EMRInstance {
                 .withHadoopJarStep(stepFactory.newEnableDebuggingStep());
 
         // specify applications to be installed and configured when EMR creates the cluster
-        Application hive = new Application().withName("Hive");
+//        Application hive = new Application().withName("Hive");
         Application spark = new Application().withName("Spark");
-        Application ganglia = new Application().withName("Ganglia");
-        Application zeppelin = new Application().withName("Zeppelin");
+//        Application ganglia = new Application().withName("Ganglia");
+//        Application zeppelin = new Application().withName("Zeppelin");
 
         // create the cluster
         RunJobFlowRequest request = new RunJobFlowRequest()
                 .withName("MyClusterCreatedFromJava")
                 .withReleaseLabel("emr-5.20.0") // specifies the EMR release version label, we recommend the latest release
                 .withSteps(enableDebugging)
-                .withApplications(hive, spark, ganglia, zeppelin)
+                .withApplications( spark)
+//                .withApplications(hive, spark, ganglia, zeppelin)
                 .withLogUri(s3Path) // a URI in S3 for log files is required when debugging is enabled
                 .withServiceRole("EMR_DefaultRole") // replace the default with a custom IAM service role if one is used
                 .withJobFlowRole("EMR_EC2_DefaultRole") // replace the default with a custom EMR role for the EC2 instance profile if one is used
@@ -69,10 +70,9 @@ public class EMRInstance {
 
     public static void main(String[] args) throws IllegalAccessException {
 
-        final String id = "2020-10-05-2eef10e2307f412cb0d0a522717ba7ec";
-        final String s3Path = "s3://" + id;
+        final String s3Path = "s3://" + DEFAULT.id;
 
-        JobID.set(id);
+        JobID.set(DEFAULT.id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
         AWSCredentials credentials = AWSCredentialInstance.get();
 

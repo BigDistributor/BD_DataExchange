@@ -14,11 +14,11 @@ import java.io.IOException;
 
 public class UploadFolder {
     private final static String TEST_N5 = "/Users/Marwan/Desktop/BigDistributer/test_files/dataset.n5";
-    private final static String id = "2020-10-05-2eef10e2307f412cb0d0a522717ba7ec";
+
 
 
     public static void main(String[] args) throws IllegalAccessException, InterruptedException, IOException {
-        JobID.set(id);
+        JobID.set(DEFAULT.id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
         S3ClientInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1);
@@ -33,7 +33,7 @@ public class UploadFolder {
         if (!file.isDirectory())
             throw new IOException(file.getAbsolutePath()+" Not folder ! ");
 
-        MultipleFileUpload upload = tm.uploadDirectory(JobID.get(), "", file, true);
+        MultipleFileUpload upload = tm.uploadDirectory(JobID.get(), "source.n5", file, true);
 
         System.out.println("Started!");
         upload.waitForCompletion();

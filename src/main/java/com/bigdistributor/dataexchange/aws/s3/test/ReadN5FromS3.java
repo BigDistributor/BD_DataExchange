@@ -18,16 +18,15 @@ public class ReadN5FromS3 {
 
     private final static String DATASET = "/volumes/raw";
 
-    private final static String id = "2020-10-05-2eef10e2307f412cb0d0a522717ba7ec";
 
     public static void main(String[] args) throws IllegalAccessException, IOException {
-        JobID.set(id);
+        JobID.set(DEFAULT.id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
         S3ClientInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1);
 
         AmazonS3 s3 = S3ClientInstance.get();
-        N5AmazonS3Reader reader = new N5AmazonS3Reader(s3, id);
+        N5AmazonS3Reader reader = new N5AmazonS3Reader(s3, DEFAULT.id);
 
         RandomAccessibleInterval<FloatType> virtual = N5Utils.open(reader, DATASET);
         ImageJFunctions.show(virtual, "From S3");
