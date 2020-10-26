@@ -5,6 +5,11 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.bigdistributor.dataexchange.job.model.JobID;
+
+import java.util.List;
 
 public class S3ClientInstance {
     static AmazonS3 instance;
@@ -30,4 +35,11 @@ public class S3ClientInstance {
         return new S3ClientInstance(s3client);
     }
 
+    public static void showAll() throws IllegalAccessException {
+        ListObjectsV2Result result = get().listObjectsV2(JobID.get());
+        List<S3ObjectSummary> objects = result.getObjectSummaries();
+        for (S3ObjectSummary os : objects) {
+            System.out.println("* " + os.getKey());
+        }
+    }
 }
