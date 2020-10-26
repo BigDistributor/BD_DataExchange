@@ -7,7 +7,6 @@ import com.bigdistributor.dataexchange.aws.s3.model.S3ClientInstance;
 import com.bigdistributor.dataexchange.job.model.JobID;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import org.janelia.saalfeldlab.n5.imglib2.N5Utils;
 import org.janelia.saalfeldlab.n5.s3.N5AmazonS3Reader;
@@ -29,6 +28,6 @@ public class ReadN5FromS3 {
         N5AmazonS3Reader reader = new N5AmazonS3Reader(s3, DEFAULT.id);
 
         RandomAccessibleInterval<FloatType> virtual = N5Utils.open(reader, DATASET);
-        ImageJFunctions.show(virtual, "From S3");
+//        ImageJFunctions.show(virtual, "From S3");
     }
 }
