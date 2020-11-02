@@ -3,7 +3,7 @@ package com.bigdistributor.dataexchange.aws.s3.test;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.bigdistributor.dataexchange.aws.s3.model.AWSCredentialInstance;
-import com.bigdistributor.dataexchange.aws.s3.model.S3ClientInstance;
+import com.bigdistributor.dataexchange.aws.s3.model.S3BucketInstance;
 import com.bigdistributor.dataexchange.job.model.JobID;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 import net.imglib2.RandomAccessibleInterval;
@@ -22,10 +22,10 @@ public class ReadN5FromS3 {
         JobID.set(DEFAULT.id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
-        S3ClientInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1);
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, DEFAULT.id);
 
-        AmazonS3 s3 = S3ClientInstance.get();
-        N5AmazonS3Reader reader = new N5AmazonS3Reader(s3, DEFAULT.id);
+        AmazonS3 s3 = S3BucketInstance.get().getS3();
+        N5AmazonS3Reader reader = new N5AmazonS3Reader(S3BucketInstance.get().getS3(), S3BucketInstance.get().getBucketName());
 
         RandomAccessibleInterval<FloatType> virtual = N5Utils.open(reader, DATASET);
 //        ImageJFunctions.show(virtual, "From S3");
