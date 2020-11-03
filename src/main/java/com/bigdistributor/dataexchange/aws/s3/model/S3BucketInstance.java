@@ -41,7 +41,8 @@ public class S3BucketInstance {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withRegion(region)
                 .build();
-        return new S3BucketInstance(s3client, bucket);
+        instance = new S3BucketInstance(s3client, bucket);
+        return instance;
     }
 
     public static AmazonS3 initS3(AWSCredentials credentials, Regions region) {

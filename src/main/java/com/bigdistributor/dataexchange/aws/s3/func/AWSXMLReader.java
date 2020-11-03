@@ -7,13 +7,17 @@ import com.bigdistributor.dataexchange.aws.s3.model.AWSCredentialInstance;
 import com.bigdistributor.dataexchange.aws.s3.model.S3BucketInstance;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 import com.google.common.io.CharStreams;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.StAXEventBuilder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import java.io.*;
 
-public class XMLReader {
+
+public class AWSXMLReader {
 
     private static final String defaultName = "dataset.xml";
 
@@ -21,38 +25,43 @@ public class XMLReader {
     private final String path;
     private final String fileName;
 
-    public XMLReader(S3BucketInstance bucketInstance, String path, String fileName) {
+    public AWSXMLReader(S3BucketInstance bucketInstance, String path, String fileName) {
         this.bucketInstance = bucketInstance;
         this.path = path;
         this.fileName = fileName;
     }
 
-    public XMLReader(S3BucketInstance s3, String path) {
+    public AWSXMLReader(S3BucketInstance s3, String path) {
         this(s3, path, defaultName);
     }
 
-    public String read() throws IllegalAccessException, IOException {
+    public Document read() throws IllegalAccessException, IOException, JDOMException, XMLStreamException {
         S3Object object = bucketInstance.getS3().getObject(new GetObjectRequest(bucketInstance.getBucketName(), path + fileName));
         InputStream objectData = object.getObjectContent();
-        // Process the objectData stream.
         String text = null;
         try (Reader reader = new InputStreamReader(objectData)) {
             text = CharStreams.toString(reader);
             System.out.println(text);
         }
         objectData.close();
-        return text;
+        return parseXML(text);
+    }
 
+    private Document parseXML(String text) throws XMLStreamException, JDOMException {
+        XMLInputFactory factory = XMLInputFactory.newFactory();
+        XMLEventReader reader = factory.createXMLEventReader(new StringReader(text));
+        StAXEventBuilder builder = new StAXEventBuilder();
+        return builder.build(reader);
     }
 
 
-    public static void main(String[] args) throws IllegalAccessException, IOException {
+    public static void main(String[] args) throws IllegalAccessException, IOException, JDOMException, XMLStreamException {
 
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
         S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, DEFAULT.bucket_name);
 
-        String xml = new XMLReader(S3BucketInstance.get(), "big/").read();
+        Document xml = new AWSXMLReader(S3BucketInstance.get(), "big/").read();
 
         System.out.println(xml);
     }
