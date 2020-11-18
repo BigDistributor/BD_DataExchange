@@ -1,4 +1,4 @@
-package com.bigdistributor.dataexchange.aws.s3.func;
+package com.bigdistributor.dataexchange.aws.s3.func.bucket;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;

@@ -84,6 +84,7 @@
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jackson.version>2.5.2</jackson.version>
     </properties>
 
     <repositories>
@@ -99,6 +100,23 @@
     </repositories>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -125,21 +143,11 @@
             <artifactId>n5-aws-s3</artifactId>
             <version>3.2.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.janelia.saalfeldlab</groupId>
-            <artifactId>n5-imglib2</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <!--        ImgLib2         -->
-<!--         <dependency>
-            <groupId>net.imagej</groupId>
-            <artifactId>imagej</artifactId>
-        </dependency> -->
-<!--         <dependency>
-            <groupId>net.imglib2</groupId>
-            <artifactId>imglib2-ij</artifactId>
-            <version>2.0.0-beta-38</version>
-        </dependency> -->
+<!--        <dependency>-->
+<!--            <groupId>org.janelia.saalfeldlab</groupId>-->
+<!--            <artifactId>n5-imglib2</artifactId>-->
+<!--            <version>3.4.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>

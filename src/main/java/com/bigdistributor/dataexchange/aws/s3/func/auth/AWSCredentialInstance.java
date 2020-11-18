@@ -1,7 +1,6 @@
-package com.bigdistributor.dataexchange.aws.s3.model;
+package com.bigdistributor.dataexchange.aws.s3.func.auth;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.bigdistributor.dataexchange.aws.s3.func.AWSCredentialsReader;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 public class AWSCredentialInstance {

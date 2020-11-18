@@ -2,8 +2,8 @@ package com.bigdistributor.dataexchange.aws.s3.test;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.model.Bucket;
-import com.bigdistributor.dataexchange.aws.s3.model.AWSCredentialInstance;
-import com.bigdistributor.dataexchange.aws.s3.model.S3BucketInstance;
+import com.bigdistributor.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
+import com.bigdistributor.dataexchange.aws.s3.func.bucket.S3BucketInstance;
 import com.bigdistributor.dataexchange.job.model.JobID;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 

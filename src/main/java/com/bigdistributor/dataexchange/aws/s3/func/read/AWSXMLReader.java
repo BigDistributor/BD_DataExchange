@@ -1,12 +1,9 @@
-package com.bigdistributor.dataexchange.aws.s3.func;
+package com.bigdistributor.dataexchange.aws.s3.func.read;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.bigdistributor.dataexchange.aws.s3.model.AWSCredentialInstance;
-import com.bigdistributor.dataexchange.aws.s3.model.S3BucketInstance;
+import com.bigdistributor.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
+import com.bigdistributor.dataexchange.aws.s3.func.bucket.S3BucketInstance;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
-import com.google.common.io.CharStreams;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.StAXEventBuilder;
@@ -14,37 +11,26 @@ import org.jdom2.input.StAXEventBuilder;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
 
 
-public class AWSXMLReader {
+public class AWSXMLReader extends AWSReader {
 
     private static final String defaultName = "dataset.xml";
 
-    private final S3BucketInstance bucketInstance;
-    private final String path;
-    private final String fileName;
-
     public AWSXMLReader(S3BucketInstance bucketInstance, String path, String fileName) {
-        this.bucketInstance = bucketInstance;
-        this.path = path;
-        this.fileName = fileName;
+        super(bucketInstance, path, fileName);
+
     }
 
     public AWSXMLReader(S3BucketInstance s3, String path) {
         this(s3, path, defaultName);
     }
 
-    public Document read() throws IllegalAccessException, IOException, JDOMException, XMLStreamException {
-        S3Object object = bucketInstance.getS3().getObject(new GetObjectRequest(bucketInstance.getBucketName(), path + fileName));
-        InputStream objectData = object.getObjectContent();
-        String text = null;
-        try (Reader reader = new InputStreamReader(objectData)) {
-            text = CharStreams.toString(reader);
-            System.out.println(text);
-        }
-        objectData.close();
-        return parseXML(text);
+
+    public Document read() throws IOException, JDOMException, XMLStreamException {
+        return parseXML(super.get());
     }
 
     private Document parseXML(String text) throws XMLStreamException, JDOMException {
@@ -53,7 +39,6 @@ public class AWSXMLReader {
         StAXEventBuilder builder = new StAXEventBuilder();
         return builder.build(reader);
     }
-
 
     public static void main(String[] args) throws IllegalAccessException, IOException, JDOMException, XMLStreamException {
 
