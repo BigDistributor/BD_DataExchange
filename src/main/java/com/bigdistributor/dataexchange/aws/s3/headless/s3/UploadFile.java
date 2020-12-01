@@ -1,4 +1,4 @@
-package com.bigdistributor.dataexchange.aws.s3.test;
+package com.bigdistributor.dataexchange.aws.s3.headless.s3;
 
 import com.amazonaws.regions.Regions;
 import com.bigdistributor.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
@@ -7,19 +7,17 @@ import com.bigdistributor.dataexchange.job.model.JobID;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 import java.io.File;
-import java.io.IOException;
 
-public class UploadFolder {
-    private final static String TEST_N5 = "/Users/Marwan/Desktop/BigDistributer/test_files/dataset.n5";
+public class UploadFile {
 
-    public static void main(String[] args) throws IllegalAccessException, InterruptedException, IOException {
+    public static void main(String[] args) throws IllegalAccessException, InterruptedException {
         JobID.set(DEFAULT.id);
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
 
         S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1,DEFAULT.id);
 
-        File file = new File(TEST_N5);
-        S3BucketInstance.get().upload(file);
+        File file = new File(DEFAULT.jar) ;
 
+        S3BucketInstance.get().uploadFile(file);
     }
 }

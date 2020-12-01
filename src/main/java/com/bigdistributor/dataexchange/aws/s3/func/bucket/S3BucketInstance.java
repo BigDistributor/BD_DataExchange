@@ -68,10 +68,10 @@ public class S3BucketInstance {
     public void uploadFolder(File file) throws InterruptedException {
         TransferManager tm = TransferManagerBuilder.standard().withS3Client(s3).build();
         MultipleFileUpload upload = tm.uploadDirectory(JobID.get(), file.getName(), file, true);
-        System.out.println("Started!");
+        System.out.println("uploading "+file.getAbsolutePath());
         upload.waitForCompletion();
 
-        System.out.println("\nComplete");
+        System.out.println("Complete");
     }
 
     public void createBucket() {
@@ -96,12 +96,9 @@ public class S3BucketInstance {
 
     public void uploadFile(File file) throws InterruptedException {
         TransferManager tm = TransferManagerBuilder.standard().withS3Client(s3).build();
-
         Upload upload = tm.upload(bucketName, file.getName(), file);
-
-        System.out.println("Started!");
+        System.out.println("uploading "+file.getAbsolutePath());
         upload.waitForCompletion();
-
-        System.out.println("\nComplete");
+        System.out.println("Complete");
     }
 }

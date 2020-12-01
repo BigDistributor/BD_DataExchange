@@ -1,28 +1,31 @@
-package com.bigdistributor.dataexchange.aws.s3.test;
+package com.bigdistributor.dataexchange.aws.s3.headless.s3;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
 import com.bigdistributor.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
 import com.bigdistributor.dataexchange.aws.s3.func.bucket.S3BucketInstance;
+import com.bigdistributor.dataexchange.job.model.JobID;
 import com.bigdistributor.dataexchange.utils.DEFAULT;
 
 import java.util.List;
 
-public class DeleteAllBuckets {
+public class CreateBucket {
     public static void main(String[] args) throws IllegalAccessException {
 
         AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
-        AmazonS3 s3 = S3BucketInstance.initS3(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1);
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1,JobID.get());
+
+//        Create Bucket
+        S3BucketInstance.get().createBucket();
 
 //        List Buckets
-        List<Bucket> buckets = s3.listBuckets();
+        List<Bucket> buckets = S3BucketInstance.get().getS3().listBuckets();
 
 //        Delete all
-        for (Bucket bucket : buckets) {
+        for(Bucket bucket : buckets) {
             System.out.println(bucket.toString());
-            s3.deleteBucket(bucket.getName());
-            System.out.println(bucket.getName() + " Deleted !");
         }
+
+
     }
 }
