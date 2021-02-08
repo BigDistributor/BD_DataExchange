@@ -1,6 +1,6 @@
 package com.bigdistributor.aws.dataexchange.utils.readfile;
 
-import com.bigdistributor.aws.dataexchange.utils.DEFAULT;
+import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
 import com.google.common.base.Joiner;
 
 import java.io.BufferedReader;
@@ -51,7 +51,7 @@ public class CSVReader {
     }
 
     public static void main(String[] args) {
-        final String csv_path = DEFAULT.AWS_CREDENTIALS_PATH;
+        final String csv_path = AWS_DEFAULT.AWS_CREDENTIALS_PATH;
         CSVReader reader = new CSVReader(csv_path);
         System.out.println(reader);
     }

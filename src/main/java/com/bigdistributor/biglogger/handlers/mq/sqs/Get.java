@@ -5,7 +5,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
-import com.bigdistributor.aws.dataexchange.utils.DEFAULT;
+import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class Get {
 
 
     public static void main(String[] args) throws IllegalAccessException {
-        AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
+        AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
         final AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
                 .build();

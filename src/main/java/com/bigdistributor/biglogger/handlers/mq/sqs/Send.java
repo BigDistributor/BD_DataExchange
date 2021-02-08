@@ -5,14 +5,14 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
-import com.bigdistributor.aws.dataexchange.utils.DEFAULT;
+import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
 
 public class Send {
     private static final String QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/547527832344/bigdistributor";
 
 
     public static void main(String[] args) throws IllegalAccessException {
-        AWSCredentialInstance.init(DEFAULT.AWS_CREDENTIALS_PATH);
+        AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
         final AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
                 .build();

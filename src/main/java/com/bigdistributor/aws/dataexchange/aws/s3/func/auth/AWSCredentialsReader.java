@@ -2,7 +2,7 @@ package com.bigdistributor.aws.dataexchange.aws.s3.func.auth;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.bigdistributor.aws.dataexchange.utils.DEFAULT;
+import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
 import com.bigdistributor.aws.dataexchange.utils.readfile.CSVReader;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class AWSCredentialsReader extends CSVReader {
     }
 
     public static void main(String[] args) {
-        final String csv_path = DEFAULT.AWS_CREDENTIALS_PATH;
+        final String csv_path = AWS_DEFAULT.AWS_CREDENTIALS_PATH;
         AWSCredentialsReader reader = new AWSCredentialsReader(csv_path);
         AWSCredentials cred = reader.getCredentials();
         System.out.println(cred.getAWSAccessKeyId()+" - "+cred.getAWSSecretKey());
