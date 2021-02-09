@@ -30,15 +30,10 @@ public class SNSLogPublishHandler extends Handler {
     private static void init(){
         logger.info("Init AWS SNS Log Handler Initialization..");
 
-        try {
-            sqs = AmazonSQSClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
-                    .build();
-            jobId = JobID.get();
-        } catch (IllegalAccessException e) {
-            logger.error(e.toString());
-            e.printStackTrace();
-        }
+        sqs = AmazonSQSClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
+                .build();
+        jobId = JobID.get();
     }
 
     public static void main(String[] args) throws IllegalAccessException {

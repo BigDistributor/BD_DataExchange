@@ -69,16 +69,10 @@ public class SNSLogReceiverHandler implements LogReceiver {
     }
 
     private void init() {
-        try {
-            shutdown = false;
-            sqs = AmazonSQSClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
-                    .build();
-        } catch (IllegalAccessException e) {
-            shutdown = true;
-            logger.error(e.toString());
-            e.printStackTrace();
-        }
+        shutdown = false;
+        sqs = AmazonSQSClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
+                .build();
     }
 
     @Override
