@@ -17,7 +17,8 @@ public class AWSCredentialInstance {
 
     public static synchronized AWSCredentials get() throws IllegalAccessException {
         if (instance == null) {
-            throw new IllegalAccessException("Init credential before!");
+            init("");
+//            throw new IllegalAccessException("Init credential before!");
         }
         return instance;
     }

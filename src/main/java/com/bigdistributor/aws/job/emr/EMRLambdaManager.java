@@ -10,6 +10,7 @@ import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.model.ServiceException;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
 import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
+import com.bigdistributor.aws.job.JarParams;
 
 import java.nio.charset.StandardCharsets;
 
@@ -51,9 +52,7 @@ private final static String LAMBDA_FUNCTION_NAME = "EMRDistributorManager";
     }
 
     public static void main(String[] args) throws IllegalAccessException {
-
-        EMRLambdaManagerParams params = new EMRLambdaManagerParams("s3://mzouink-test/bigdistributor_tasks-0.2-SNAPSHOT-jar-with-dependencies.jar","helloFromJava","--output=s3://mzouink-test/new_output.n5/ --input=s3://mzouink-test/dataset-n5.xml --jobid=hellohello --meta=s3://mzouink-test/metadata.xml",3);
-
+        EMRLambdaManagerParams params = new EMRLambdaManagerParams("s3://mzouink-test/bigdistributor_tasks-0.2-SNAPSHOT-jar-with-dependencies.jar","helloFromJava",new JarParams("fusion","testJobId","mzouink-test","dataset-n5.xml","new_output.n5","metadata.xml",""),3);
         AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
 
         AWSCredentials credentials_profile = AWSCredentialInstance.get();

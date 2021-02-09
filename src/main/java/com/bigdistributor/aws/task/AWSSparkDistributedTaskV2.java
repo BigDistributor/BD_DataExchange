@@ -3,14 +3,13 @@ package com.bigdistributor.aws.task;
 import com.amazonaws.regions.Regions;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
+import com.bigdistributor.aws.dataexchange.aws.s3.func.read.AWSReader;
 import com.bigdistributor.aws.spimloader.AWSSpimLoader;
 import com.bigdistributor.biglogger.adapters.Log;
 import com.bigdistributor.core.blockmanagement.blockinfo.BasicBlockInfo;
-import com.bigdistributor.core.config.RemoteFile;
 import com.bigdistributor.core.spim.SpimDataLoader;
 import com.bigdistributor.core.task.BlockTask;
 import com.bigdistributor.core.task.JobID;
-import com.bigdistributor.core.task.TaskConfig;
 import com.bigdistributor.core.task.items.Metadata;
 import com.bigdistributor.core.task.items.SerializableParams;
 import com.bigdistributor.io.mvrecon.SpimHelpers;
@@ -29,7 +28,6 @@ import org.janelia.saalfeldlab.n5.imglib2.N5Utils;
 import org.janelia.saalfeldlab.n5.s3.N5AmazonS3Writer;
 import picocli.CommandLine.Option;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
@@ -38,8 +36,26 @@ import java.util.concurrent.Callable;
 // T: DataType exmpl FloatType
 // K: Task Param
 public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends SerializableParams> implements Callable<Void> {
-    @Option(names = {"-config", "--c"}, required = true, description = "The path of the Task param json file Data")
-    String configPath;
+    @Option(names = {"-o", "--output"}, required = true, description = "The path of the output Data")
+    String output;
+
+    @Option(names = {"-i", "--input"}, required = true, description = "The path of the input Data inside bucket")
+    String input;
+
+    @Option(names = {"-b", "--bucket"}, required = true, description = "The name of bucket")
+    String bucketName;
+
+    @Option(names = {"-c", "--cred"}, required = false, description = "The path of credentials")
+    String awsCredentialPath;
+
+    @Option(names = {"-id", "--jobid"}, required = true, description = "The jod Id")
+    String jobId;
+
+    @Option(names = {"-m", "--metadata"}, required = true, description = "The path of the MetaData file")
+    String metadataPath;
+
+    @Option(names = {"-p", "--param"}, required = false, description = "The path of the params file")
+    String paramPath;
 
     private static final Log logger = Log.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
@@ -54,36 +70,34 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
 
     @Override
     public Void call() throws Exception {
-        TaskConfig config = TaskConfig.fromJson(configPath);
-        md = Metadata.fromJson(config.getMetadataPath());
+        if(awsCredentialPath!= null)
+            AWSCredentialInstance.init(awsCredentialPath);
+
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName);
+
+        md = Metadata.fromJsonString(new AWSReader(S3BucketInstance.get(),"",metadataPath).get());
+        logger.info("Got metadata !");
         if (md == null) {
             logger.error("Error metadata file !");
             return null;
         }
-        JobID.set(config.getJobId());
+        JobID.set(jobId);
         logger.info(JobID.get() + " started!");
         SerializableParams<K> params = null;
+        if (paramPath!=null)
         try{
-            File paramFile = new File(config.getTaskParamsPath());
-            params = new SerializableParams<K>().fromJson(paramFile);
+            params = new SerializableParams<K>().fromJsonString(new AWSReader(S3BucketInstance.get(),"",paramPath).get());
         }catch (Exception e){
             logger.error("Invalid params: "+e.toString());
         }
 
-        RemoteFile input = config.getInput();
-        RemoteFile output = config.getOutput();
-
-        AWSCredentialInstance.init(config.getAwsCredentialPath());
-
-        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, input.getBucketName());
-
-        SpimDataLoader loader = new AWSSpimLoader(S3BucketInstance.get(), input.getPath(), input.getFileName());
+        SpimDataLoader loader = new AWSSpimLoader(S3BucketInstance.get(), "", input);
         SpimData2 spimdata = loader.getSpimdata();
         logger.info("Got spimdata");
 
         SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
-        N5Writer n5 = new N5AmazonS3Writer(S3BucketInstance.get().getS3(), output.getBucketName(), output.getFileName());
+        N5Writer n5 = new N5AmazonS3Writer(S3BucketInstance.get().getS3(), bucketName, output);
 
         createOutput(n5, md);
         final JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);

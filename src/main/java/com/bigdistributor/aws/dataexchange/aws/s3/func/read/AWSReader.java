@@ -21,7 +21,7 @@ public class AWSReader {
         this.fileName = fileName;
     }
 
-    protected String get() throws IOException {
+    public String get() throws IOException {
         S3Object object = bucketInstance.getS3().getObject(new GetObjectRequest(bucketInstance.getBucketName(), path + fileName));
         InputStream objectData = object.getObjectContent();
         String text;

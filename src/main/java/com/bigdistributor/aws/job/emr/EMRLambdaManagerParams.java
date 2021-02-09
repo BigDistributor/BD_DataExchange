@@ -1,5 +1,6 @@
 package com.bigdistributor.aws.job.emr;
 
+import com.bigdistributor.aws.job.JarParams;
 import com.google.gson.Gson;
 
 public class EMRLambdaManagerParams {
@@ -8,10 +9,10 @@ public class EMRLambdaManagerParams {
     String params;
     int instances;
 
-    public EMRLambdaManagerParams(String task, String name, String params, int instances) {
+    public EMRLambdaManagerParams(String task, String name, JarParams params, int instances) {
         this.task = task;
         this.name = name;
-        this.params = params;
+        this.params = params.toString();
         this.instances = instances;
     }
 
@@ -21,7 +22,7 @@ public class EMRLambdaManagerParams {
     }
 
     public static void main(String[] args) {
-        EMRLambdaManagerParams params = new EMRLambdaManagerParams("task","name","params",3);
+        EMRLambdaManagerParams params = new EMRLambdaManagerParams("task", "name", new JarParams("fusion", "testJobId", "mzouink-test", "dataset-n5.xml", "new_output.n5", "metadata.xml", ""), 3);
         System.out.println(params);
     }
 
