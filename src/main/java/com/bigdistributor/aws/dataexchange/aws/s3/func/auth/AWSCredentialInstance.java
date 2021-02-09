@@ -15,8 +15,9 @@ public class AWSCredentialInstance {
         instance = credentials;
     }
 
-    public static synchronized AWSCredentials get() throws IllegalAccessException {
+    public static synchronized AWSCredentials get() {
         if (instance == null) {
+            logger.error("Credential file not available, set default");
             init("");
 //            throw new IllegalAccessException("Init credential before!");
         }
@@ -25,10 +26,10 @@ public class AWSCredentialInstance {
 
     public static synchronized AWSCredentialInstance init(String path) {
         AWSCredentials credentials;
-        try{
-        AWSCredentialsReader reader = new AWSCredentialsReader(path);
-        credentials = reader.getCredentials();}
-        catch (Exception e){
+        try {
+            AWSCredentialsReader reader = new AWSCredentialsReader(path);
+            credentials = reader.getCredentials();
+        } catch (Exception e) {
             logger.warning("No credentials evaluable, set default");
             credentials = new ProfileCredentialsProvider().getCredentials();
         }

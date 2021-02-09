@@ -70,6 +70,7 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
 
     @Override
     public Void call() throws Exception {
+        JobID.set(jobId);
         if(awsCredentialPath!= null)
             AWSCredentialInstance.init(awsCredentialPath);
 
@@ -81,7 +82,7 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
             logger.error("Error metadata file !");
             return null;
         }
-        JobID.set(jobId);
+
         logger.info(JobID.get() + " started!");
         SerializableParams<K> params = null;
         if (paramPath!=null)

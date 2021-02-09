@@ -3,19 +3,20 @@ package com.bigdistributor.aws;
 import com.google.common.io.Files;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AWSWorkflow {
     private static AWSWorkflow instance;
     private File tempDir;
-    private String credentialsKeyPath;
-    private String bucketName;
-    private String localJar;
-    private String clusterJar;
-    private String clusterData;
-    List<String> localData;
-    private String metadataPath;
-    private String clusterMetada;
+    private String credentialsKeyPath = "";
+    private String bucketName = "";
+    private String localJar = "";
+    private String clusterJar = "";
+    private String clusterData = "";
+    List<String> localData = new ArrayList<>();
+    private String metadataPath = "";
+    private String clusterMetada = "";
 
     private AWSWorkflow() {
         tempDir = Files.createTempDir();
@@ -90,5 +91,18 @@ public class AWSWorkflow {
 
     public void setClusterMetadata(String name) {
         this.clusterMetada = name;
+    }
+
+    public String getClusterMetada() {
+        return clusterMetada;
+    }
+
+    public String getFullPathClusterJar() {
+        StringBuffer builder = new StringBuffer();
+        builder.append("s3://");
+        builder.append(bucketName.replace("/", ""));
+        builder.append("/");
+        builder.append(clusterJar);
+        return builder.toString();
     }
 }
