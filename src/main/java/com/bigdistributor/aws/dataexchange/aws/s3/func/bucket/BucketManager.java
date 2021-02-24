@@ -27,7 +27,7 @@ public class BucketManager {
             s3client.createBucket(name);
             logger.info("Bucket created!");
         } else {
-            logger.warning("Bucket exists!");
+            logger.error("Bucket exists!");
         }
         return this;
     }

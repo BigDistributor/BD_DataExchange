@@ -21,9 +21,4 @@ public class EMRLambdaManagerParams {
         return new Gson().toJson(this);
     }
 
-    public static void main(String[] args) {
-        EMRLambdaManagerParams params = new EMRLambdaManagerParams("task", "name", new JarParams("fusion", "testJobId", "mzouink-test", "dataset-n5.xml", "new_output.n5", "metadata.xml", ""), 3);
-        System.out.println(params);
-    }
-
 }

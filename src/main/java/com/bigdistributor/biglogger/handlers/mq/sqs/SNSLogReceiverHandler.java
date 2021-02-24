@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 
 @LogHandler(format = "SNS", type = LogMode.Advance, modes = {ApplicationMode.DistributionMaster, ApplicationMode.DistributionMasterFiji})
 public class SNSLogReceiverHandler implements LogReceiver {
-    private static final String QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/547527832344/bigdistributor";
+    private static final String QUEUE_URL = "https://sqs.eu-central-1.amazonaws.com/547527832344/bigdistributor";
     private static final Log logger = Log.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
     private ExecutorService executorService;
@@ -54,7 +54,7 @@ public class SNSLogReceiverHandler implements LogReceiver {
                         MQLogReceiveDispatchManager.addLog(m.getBody());
                     }
                 }
-                logger.warning("SNS Shutdown");
+                logger.error("SNS Shutdown");
             } catch (InterruptedException e) {
                 logger.error(e.toString());
                 restart();

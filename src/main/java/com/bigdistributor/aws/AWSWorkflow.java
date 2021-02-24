@@ -17,6 +17,7 @@ public class AWSWorkflow {
     List<String> localData = new ArrayList<>();
     private String metadataPath = "";
     private String clusterMetada = "";
+    private String clusterCredentials = "";
 
     private AWSWorkflow() {
         tempDir = Files.createTempDir();
@@ -104,5 +105,13 @@ public class AWSWorkflow {
         builder.append("/");
         builder.append(clusterJar);
         return builder.toString();
+    }
+
+    public String getClusterCredentials() {
+        return clusterCredentials;
+    }
+
+    public void setClusterCredentials(String clusterCredentials) {
+        this.clusterCredentials = clusterCredentials;
     }
 }

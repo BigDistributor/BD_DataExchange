@@ -43,6 +43,25 @@ public class CSVReader {
         return result;
     }
 
+    public static Map<String, List<String>> readText(String text) {
+        Map<String, List<String>> result = new HashMap();
+        String[] lines = text.split("\n");
+
+            String[] elms = lines[0].split(",");
+            List<String> keys = Arrays.asList(elms);
+
+            for (String k : keys)
+                result.put(k, new ArrayList<>());
+            for(int h=1;h<lines.length;h++){
+                elms = lines[h].split(",");
+                for (int i = 0; i < elms.length; i++)
+                    result.get(keys.get(i)).add(elms[i]);
+                keys = Arrays.asList(elms);
+            }
+
+        return result;
+    }
+
     @Override
     public String toString() {
         Map<String, List<String>> all = read();

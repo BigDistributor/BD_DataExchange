@@ -6,6 +6,7 @@ import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.read.AWSReader;
 import com.bigdistributor.aws.spimloader.AWSSpimLoader;
 import com.bigdistributor.biglogger.adapters.Log;
+import com.bigdistributor.biglogger.adapters.LoggerManager;
 import com.bigdistributor.core.blockmanagement.blockinfo.BasicBlockInfo;
 import com.bigdistributor.core.spim.SpimDataLoader;
 import com.bigdistributor.core.task.BlockTask;
@@ -45,8 +46,11 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
     @Option(names = {"-b", "--bucket"}, required = true, description = "The name of bucket")
     String bucketName;
 
-    @Option(names = {"-c", "--cred"}, required = false, description = "The path of credentials")
-    String awsCredentialPath;
+    @Option(names = {"-pk", "--publicKey"}, required = false, description = "Credential public key")
+    String credPublicKey;
+
+    @Option(names = {"-pp", "--privateKey"}, required = false, description = "Credential private key")
+    String credPrivateKey;
 
     @Option(names = {"-id", "--jobid"}, required = true, description = "The jod Id")
     String jobId;
@@ -70,13 +74,17 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
 
     @Override
     public Void call() throws Exception {
+        logger.info("Starting Main app ..");
         JobID.set(jobId);
-        if(awsCredentialPath!= null)
-            AWSCredentialInstance.init(awsCredentialPath);
 
+        initCredentials();
+
+        logger.info("App Id: " + jobId);
+
+        LoggerManager.initLoggers();
         S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName);
 
-        md = Metadata.fromJsonString(new AWSReader(S3BucketInstance.get(),"",metadataPath).get());
+        md = Metadata.fromJsonString(new AWSReader(S3BucketInstance.get(), "", metadataPath).get());
         logger.info("Got metadata !");
         if (md == null) {
             logger.error("Error metadata file !");
@@ -85,18 +93,18 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
 
         logger.info(JobID.get() + " started!");
         SerializableParams<K> params = null;
-        if (paramPath!=null)
-        try{
-            params = new SerializableParams<K>().fromJsonString(new AWSReader(S3BucketInstance.get(),"",paramPath).get());
-        }catch (Exception e){
-            logger.error("Invalid params: "+e.toString());
-        }
+        if (paramPath != null)
+            try {
+                params = new SerializableParams<K>().fromJsonString(new AWSReader(S3BucketInstance.get(), "", paramPath).get());
+            } catch (Exception e) {
+                logger.error("Invalid params: " + e.toString());
+            }
 
         SpimDataLoader loader = new AWSSpimLoader(S3BucketInstance.get(), "", input);
         SpimData2 spimdata = loader.getSpimdata();
         logger.info("Got spimdata");
 
-        SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).setMaster("local").set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
         N5Writer n5 = new N5AmazonS3Writer(S3BucketInstance.get().getS3(), bucketName, output);
 
@@ -116,6 +124,15 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
         return null;
     }
 
+    private void initCredentials() {
+        if (credPrivateKey != null && credPublicKey != null) {
+            logger.info("Init credentials with keys ..");
+            AWSCredentialInstance.initWithKey(credPublicKey, credPrivateKey);
+        } else {
+            logger.error("No credentials provided, set to default, this can affect functionalities! ");
+        }
+    }
+
     private void createOutput(N5Writer n5, Metadata md) throws IOException {
         long[] dims = dimensionsAsLongArray(md.getBb());
         int[] blockSize = Arrays.stream(md.getBlocksize()).mapToInt(i -> (int) i).toArray();
@@ -124,7 +141,6 @@ public class AWSSparkDistributedTaskV2<T extends NativeType<T>, K extends Serial
                 blockSize,
                 DataType.FLOAT32,
                 new GzipCompression());
-
         n5.createDataset(dataset, attributes);
     }
 

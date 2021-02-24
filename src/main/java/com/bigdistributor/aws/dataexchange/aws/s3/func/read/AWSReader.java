@@ -22,14 +22,17 @@ public class AWSReader {
     }
 
     public String get() throws IOException {
-        S3Object object = bucketInstance.getS3().getObject(new GetObjectRequest(bucketInstance.getBucketName(), path + fileName));
+        GetObjectRequest request = new GetObjectRequest(bucketInstance.getBucketName(), path + fileName);
+        System.out.println("Getting file: "+request.getKey() + " from bucket "+ request.getBucketName());
+        S3Object object = bucketInstance.getS3().getObject(request);
         InputStream objectData = object.getObjectContent();
         String text;
         try (Reader reader = new InputStreamReader(objectData)) {
             text = CharStreams.toString(reader);
-            System.out.println(text);
+//            System.out.println(text);
         }
         objectData.close();
+//        System.out.println("Text got : " +text);
         return text;
     }
 }

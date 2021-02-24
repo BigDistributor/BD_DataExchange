@@ -12,7 +12,6 @@
     <url>https://github.com/BigDistributor</url>
     <inceptionYear>2020</inceptionYear>
 
-
     <organization>
         <name>Preibisch Lab</name>
         <url>https://preibischlab.mdc-berlin.de/</url>
@@ -93,30 +92,16 @@
     </repositories>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
-            <groupId>net.preibisch</groupId>
-            <artifactId>BigStitcher</artifactId>
-            <version>0.7.0</version>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>2.4.7</version>
         </dependency>
         <dependency>
             <groupId>com.bigdistributor</groupId>
             <version>0.1-SNAPSHOT</version>
             <artifactId>BigDistributor-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
@@ -125,20 +110,6 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.11.950</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>23.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
         <!--        N5-->
         <dependency>
             <groupId>org.janelia.saalfeldlab</groupId>
@@ -157,39 +128,17 @@
             <artifactId>aws-java-sdk-lambda</artifactId>
             <version>1.11.950</version>
         </dependency>
-
-
-        <!--        <dependency>-->
-<!--            <groupId>org.janelia.saalfeldlab</groupId>-->
-<!--            <artifactId>n5-imglib2</artifactId>-->
-<!--            <version>3.4.0</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>3.9.2</version>
-        </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
             <version>2.0.6</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.janelia.saalfeldlab</groupId>-->
-<!--            <artifactId>n5-imglib2</artifactId>-->
-<!--        </dependency>-->
-        <!--        <dependency>-->
-<!--            <groupId>sc.fiji</groupId>-->
-<!--            <artifactId>bigdataviewer-core</artifactId>-->
-<!--            <version>10.1.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>net.preibisch</groupId>-->
-<!--            <artifactId>multiview-reconstruction</artifactId>-->
-<!--            <version>0.8.6-SNAPSHOT</version>-->
-<!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-emr -->
 
+        <dependency>
+            <groupId>net.imglib2</groupId>
+            <artifactId>imglib2</artifactId>
+            <version>5.10.0</version>
+        </dependency>
     </dependencies>
 
     <build>

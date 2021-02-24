@@ -15,6 +15,8 @@ import com.bigdistributor.core.remote.mq.entities.MQTopic;
 import com.bigdistributor.core.task.JobID;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -23,17 +25,23 @@ import java.util.logging.LogRecord;
 public class SNSLogPublishHandler extends Handler {
 
     private static final Log logger = Log.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
-    private static final String QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/547527832344/bigdistributor";
+    private static final String QUEUE_URL = "https://sqs.eu-central-1.amazonaws.com/547527832344/bigdistributor";
     private static AmazonSQS sqs;
     private static String jobId;
 
-    private static void init(){
+    public SNSLogPublishHandler() {
+        final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.schedule(() -> init(), 3, TimeUnit.SECONDS);
+    }
+
+    private static void init() {
         logger.info("Init AWS SNS Log Handler Initialization..");
 
         sqs = AmazonSQSClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(AWSCredentialInstance.get()))
                 .build();
         jobId = JobID.get();
+
     }
 
     public static void main(String[] args) throws IllegalAccessException {
@@ -47,22 +55,11 @@ public class SNSLogPublishHandler extends Handler {
                 .withQueueUrl(QUEUE_URL)
                 .withMessageBody("hello world111");
         sqs.sendMessage(send_msg_request);
-
-        // all message
-//        SendMessageBatchRequest send_batch_request = new SendMessageBatchRequest()
-//                .withQueueUrl(QUEUE_URL)
-//                .withEntries(
-//                        new SendMessageBatchRequestEntry(
-//                                "msg_1", "Hello from message 1"),
-//                        new SendMessageBatchRequestEntry(
-//                                "msg_2", "Hello from message 2")
-//                                .withDelaySeconds(10));
-//        sqs.sendMessageBatch(send_batch_request);
     }
 
     @Override
     public void publish(LogRecord record) {
-        if(sqs!=null){
+        if (sqs != null) {
             String message;
             if (record.getLevel() == Level.WARNING) {
                 message = record.getMessage();
@@ -76,7 +73,8 @@ public class SNSLogPublishHandler extends Handler {
             sqs.sendMessage(send_msg_request);
         }
         else{
-            init();
+//            logger.error("Invalid ");
+//            init();
         }
 
     }

@@ -1,33 +1,37 @@
 package com.bigdistributor.aws.job;
 
-public class JarParams {
-    String task;
-    String jobid;
-    String output;
-    String input;
-    String metada;
-    String bucketname;
-    String params;
+import com.amazonaws.auth.AWSCredentials;
 
-    public JarParams(String task, String jobid, String bucketname, String input, String output, String metada, String params) {
+public class JarParams {
+    private final AWSCredentials cred;
+    private final String task;
+    private final String jobid;
+    private final String output;
+    private final String input;
+    private final String metadata;
+    private final String bucketname;
+    private final String params;
+
+    public JarParams(String task, String jobid, String bucketname, String input, String output, String metadata, String params, AWSCredentials cred) {
         this.task = task;
         this.jobid = jobid;
         this.output = output;
         this.input = input;
-        this.metada = metada;
+        this.metadata = metadata;
         this.bucketname = bucketname;
         this.params = params;
+        this.cred = cred;
     }
 
-    //"--output=s3://mzouink-test/new_output.n5/ --input=s3://mzouink-test/dataset-n5.xml --jobid=hellohello --meta=s3://mzouink-test/metadata.xml"
     @Override
     public String toString() {
-        return task+
-                " --jobid=" + jobid
-                + " --bucket=" + bucketname
-                + " --input=" + input
-                + " --output=" + output
-                + " --metadata=" + metada
-                + " --params=" + params;
+        return task +
+                ParamsKey.JOB_ID.toString() + jobid
+                + ParamsKey.BUCKET_NAME.toString() + bucketname
+                + ParamsKey.INPUT.toString() + input
+                + ParamsKey.OUTPUT.toString() + output
+                + ParamsKey.METADATA.toString() + metadata
+                + ((params == null || params.trim().isEmpty()) ? "" : ParamsKey.TASK_PARAMS.toString() + params)
+                + ((cred == null) ? "" : (ParamsKey.CREDENTIAL_PUBLIC_KEY.toString() + cred.getAWSAccessKeyId() + ParamsKey.CREDENTIAL_PRIVATE_KEY.toString() + cred.getAWSSecretKey()));
     }
 }

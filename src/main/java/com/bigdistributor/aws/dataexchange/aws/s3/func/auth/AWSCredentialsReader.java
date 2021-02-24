@@ -9,11 +9,20 @@ import java.util.List;
 import java.util.Map;
 
 public class AWSCredentialsReader extends CSVReader {
-    private final String ACCESS_KEY_ID = "Access key ID";
-    private final String SECRET_ACCESS_KEY = "Secret access key";
+    private static final String ACCESS_KEY_ID = "Access key ID";
+    private static final String SECRET_ACCESS_KEY = "Secret access key";
 
     public AWSCredentialsReader(String path) {
         super(path);
+    }
+
+    public static AWSCredentials getFromText(String text){
+        Map<String, List<String>> values = readText(text);
+        AWSCredentials credentials = new BasicAWSCredentials(
+                values.get(ACCESS_KEY_ID).get(0),
+                values.get(SECRET_ACCESS_KEY).get(0)
+        );
+        return credentials;
     }
 
     public AWSCredentials getCredentials() {

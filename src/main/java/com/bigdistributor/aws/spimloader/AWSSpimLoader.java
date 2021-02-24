@@ -1,11 +1,13 @@
 package com.bigdistributor.aws.spimloader;
 
+import bdv.img.awsspim.XmlIoAWSSpimImageLoader;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
 import com.bigdistributor.core.spim.SpimDataLoader;
 import com.google.common.io.CharStreams;
 import mpicbg.spim.data.SpimDataException;
+import mpicbg.spim.data.generic.sequence.ImgLoaders;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
 import org.jdom2.Document;
@@ -30,6 +32,7 @@ public class AWSSpimLoader implements SpimDataLoader {
         this.bucketInstance = bucketInstance;
         this.path = path;
         this.fileName = fileName;
+        ImgLoaders.registerManually(XmlIoAWSSpimImageLoader.class);
     }
 
     public AWSSpimLoader(S3BucketInstance s3, String path) {
@@ -45,7 +48,7 @@ public class AWSSpimLoader implements SpimDataLoader {
         try (Reader reader = new InputStreamReader(objectData)) {
             text = CharStreams.toString(reader);
             System.out.println("XML load !");
-            System.out.println(text);
+//            System.out.println(text);
         }
         objectData.close();
         doc =  parseXML(text);

@@ -39,8 +39,8 @@ import java.io.File;
 import static mpicbg.spim.data.XmlHelpers.loadPath;
 import static mpicbg.spim.data.XmlKeys.IMGLOADER_FORMAT_ATTRIBUTE_NAME;
 
-@ImgLoaderIo( format = "bdv.aws", type = bdv.img.awsspim.AWSSpimImageLoader.class )
-public class XmlIoAWSSpimImageLoader implements XmlIoBasicImgLoader<bdv.img.awsspim.AWSSpimImageLoader> {
+@ImgLoaderIo( format = "bdv.aws", type = AWSSpimImageLoader.class )
+public class XmlIoAWSSpimImageLoader implements XmlIoBasicImgLoader<AWSSpimImageLoader> {
 
     @Override
     public Element toXml(final AWSSpimImageLoader imgLoader, final File basePath )
