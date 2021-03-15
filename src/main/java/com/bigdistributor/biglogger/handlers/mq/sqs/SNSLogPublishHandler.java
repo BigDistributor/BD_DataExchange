@@ -5,7 +5,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
-import com.bigdistributor.aws.dataexchange.utils.AWS_DEFAULT;
+import com.bigdistributor.aws.utils.AWS_DEFAULT;
 import com.bigdistributor.biglogger.adapters.Log;
 import com.bigdistributor.biglogger.generic.LogHandler;
 import com.bigdistributor.biglogger.generic.LogMode;

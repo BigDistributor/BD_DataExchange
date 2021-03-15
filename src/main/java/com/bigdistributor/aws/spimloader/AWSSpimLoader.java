@@ -1,90 +1,48 @@
 package com.bigdistributor.aws.spimloader;
 
-import bdv.img.awsspim.XmlIoAWSSpimImageLoader;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.AmazonS3;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
-import com.bigdistributor.core.spim.SpimDataLoader;
-import com.google.common.io.CharStreams;
+import com.bigdistributor.io.TempFolder;
 import mpicbg.spim.data.SpimDataException;
-import mpicbg.spim.data.generic.sequence.ImgLoaders;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.StAXEventBuilder;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-public class AWSSpimLoader implements SpimDataLoader {
+public class AWSSpimLoader {
 
-    private static final String defaultName = "dataset.xml";
-
-    private final S3BucketInstance bucketInstance;
+    private final AmazonS3 s3;
     private final String path;
     private final String fileName;
-    private Document doc;
+    private final String bucketname;
+    //    private Document doc;
+    private File localFile;
 
-    public AWSSpimLoader(S3BucketInstance bucketInstance, String path, String fileName) {
-        this.bucketInstance = bucketInstance;
+    public AWSSpimLoader(AmazonS3 s3, String bucketName, String path, String fileName) {
+        this.s3 = s3;
+        this.bucketname = bucketName;
         this.path = path;
         this.fileName = fileName;
-        ImgLoaders.registerManually(XmlIoAWSSpimImageLoader.class);
+//        ImgLoaders.registerManually(XmlIoAWSSpimImageLoader.class);
     }
 
-    public AWSSpimLoader(S3BucketInstance s3, String path) {
-        this(s3, path, defaultName);
-    }
-
-    private void read() throws IOException, JDOMException, XMLStreamException {
-        if(doc!=null)
-            return;
-        S3Object object = bucketInstance.getS3().getObject(new GetObjectRequest(bucketInstance.getBucketName(), path + fileName));
-        InputStream objectData = object.getObjectContent();
-        String text = null;
-        try (Reader reader = new InputStreamReader(objectData)) {
-            text = CharStreams.toString(reader);
-            System.out.println("XML load !");
-//            System.out.println(text);
-        }
-        objectData.close();
-        doc =  parseXML(text);
-    }
-
-    private Document parseXML(String text) throws XMLStreamException, JDOMException {
-        XMLInputFactory factory = XMLInputFactory.newFactory();
-        XMLEventReader reader = factory.createXMLEventReader(new StringReader(text));
-        StAXEventBuilder builder = new StAXEventBuilder();
-        return builder.build(reader);
+    public AWSSpimLoader(S3BucketInstance instance, String path, String fileName) {
+        this(instance.getS3(), instance.getBucketName(), path, fileName);
     }
 
     public String getFile() {
         return fileName;
     }
 
-    @Override
     public SpimData2 getSpimdata() {
-        if (doc==null){
-            try {
-                read();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            } catch (XMLStreamException e) {
-                e.printStackTrace();
-            }
-            return getSpimdata();
-        }
-        else{
-            try {
-                return new XmlIoSpimData2("").fromXml(doc.getRootElement(),new File(""));
-            } catch (SpimDataException e) {
-                e.printStackTrace();
-            }
+        try {
+            S3BucketInstance.get().downloadFrom(TempFolder.get(), path, new String[]{fileName, "interpolations"});
+            this.localFile = new File(TempFolder.get(), fileName);
+            return new XmlIoSpimData2("").load(localFile.getAbsolutePath());
+
+        } catch (IllegalAccessException | InterruptedException | SpimDataException | IOException e) {
+            e.printStackTrace();
         }
         return null;
     }

@@ -4,7 +4,7 @@ package com.bigdistributor.aws.spimloader;
 import com.amazonaws.regions.Regions;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
-import com.bigdistributor.aws.dataexchange.job.model.Params;
+import com.bigdistributor.aws.job.utils.Params;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.generic.AbstractSpimData;
 import mpicbg.spim.data.generic.XmlIoAbstractSpimData;
@@ -33,8 +33,7 @@ public class AWSXmlIoSpimData2<S extends AbstractSequenceDescription<?, ?, ?>, T
         this.params = Params.get();
         AWSCredentialInstance.init(params.getCredentialPath());
         S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, params.getBucketName());
-//        awsio = new AWSXMLReader(S3BucketInstance.get(), params.getPath(), params.getXmlFile());
-        awsio = new AWSSpimLoader(S3BucketInstance.get(),params.getPath(), params.getXmlFile());
+        awsio = new AWSSpimLoader(S3BucketInstance.get(), params.getPath(), params.getXmlFile());
 
     }
 
