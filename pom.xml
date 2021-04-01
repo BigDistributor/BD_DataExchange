@@ -5,7 +5,7 @@
 
     <groupId>com.bigdistributor</groupId>
     <artifactId>BigDistributor_AWS</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 
     <name>Big Distributor AWS functional</name>
     <description>.</description>
