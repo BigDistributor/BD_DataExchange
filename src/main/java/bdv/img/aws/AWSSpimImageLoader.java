@@ -85,8 +85,10 @@ public class AWSSpimImageLoader implements ViewerImgLoader, MultiResolutionImgLo
 
                 try
                 {
-                    System.out.println("N5 file name = "+n5File.getName());
-                    this.n5 = new N5AmazonS3Reader(S3BucketInstance.get().getS3(), S3BucketInstance.get().getBucketName(),n5File.getName());
+                    String path = S3BucketInstance.get().getPath();
+                    String file = path.isEmpty() ? n5File.getName() : new File(path, n5File.getName()).getPath();
+                    System.out.println("N5 file = "+file);
+                    this.n5 = new N5AmazonS3Reader(S3BucketInstance.get().getS3(), S3BucketInstance.get().getBucketName(),file);
 
 //                    this.n5 = new N5FSReader( n5File.getAbsolutePath() );
 

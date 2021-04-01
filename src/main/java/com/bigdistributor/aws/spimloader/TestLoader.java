@@ -15,7 +15,7 @@ public class TestLoader {
 
         AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
 
-        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, AWS_DEFAULT.bucket_name);
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, AWS_DEFAULT.bucket_name,"big/");
 
         AWSSpimLoader loader = new AWSSpimLoader(S3BucketInstance.get(), "big/", "dataset.xml");
         SpimData2 data = loader.getSpimdata();

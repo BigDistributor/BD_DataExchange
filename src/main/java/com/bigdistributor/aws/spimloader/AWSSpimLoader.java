@@ -2,15 +2,15 @@ package com.bigdistributor.aws.spimloader;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
+import com.bigdistributor.core.spim.SpimDataLoader;
 import com.bigdistributor.io.TempFolder;
 import mpicbg.spim.data.SpimDataException;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
 
 import java.io.File;
-import java.io.IOException;
 
-public class AWSSpimLoader {
+public class AWSSpimLoader implements SpimDataLoader {
 
     private final AmazonS3 s3;
     private final String path;
@@ -37,11 +37,14 @@ public class AWSSpimLoader {
 
     public SpimData2 getSpimdata() {
         try {
-            S3BucketInstance.get().downloadFrom(TempFolder.get(), path, new String[]{fileName, "interpolations"});
+            S3BucketInstance.get().download(TempFolder.get(), fileName, path).getAbsolutePath();
+//            s3.downloadFrom(tmpFolder, params.getPath(), params.getExtraFiles());
+
+//            S3BucketInstance.get().downloadFrom(TempFolder.get(), path, new String[]{fileName, "interpolations"});
             this.localFile = new File(TempFolder.get(), fileName);
             return new XmlIoSpimData2("").load(localFile.getAbsolutePath());
 
-        } catch (IllegalAccessException | InterruptedException | SpimDataException | IOException e) {
+        } catch (IllegalAccessException | SpimDataException e) {
             e.printStackTrace();
         }
         return null;

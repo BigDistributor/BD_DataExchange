@@ -49,6 +49,9 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
     @Option(names = {"-i", "--input"}, required = true, description = "The path of the input Data inside bucket")
     String input;
 
+    @Option(names = {"-p", "--path"}, required = true, description = "The path of the input Data inside bucket")
+    String path;
+
     @Option(names = {"-b", "--bucket"}, required = true, description = "The name of bucket")
     String bucketName;
 
@@ -81,7 +84,9 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
 
     @Override
     public Void call() throws Exception {
+        AWSCredentialInstance.initWithKey(credPublicKey,credPrivateKey);
         File logFile = new File("/Users/Marwan/Desktop/log_" + jobId + ".txt");
+        File sparkLog = new File("/Users/Marwan/Desktop/log_spark_" + jobId + ".txt");
         logger.info("Starting Main app ..");
         LogAccumulator accumulator = new LogAccumulator(logFile.getAbsolutePath());
         TaskLog mainLog = new TaskLog(-1);
@@ -93,7 +98,7 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
         logger.info("App Id: " + jobId);
 
         LoggerManager.initLoggers();
-        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName);
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName,path);
 
         md = Metadata.fromJsonString(new AWSReader(S3BucketInstance.get(), "", metadataPath).get());
         logger.info("Got metadata !");
@@ -124,7 +129,7 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
         mainLog.setStatus(TimeLabel.OutputCreated);
         accumulator.append(mainLog.toString());
         final SparkContext sc = new SparkContext(sparkConf);
-        sc.addSparkListener(new CustomSparkListener(logFile));
+        sc.addSparkListener(new CustomSparkListener(sparkLog));
         final JavaSparkContext sparkContext = new JavaSparkContext(sc);
 
         SerializableParams<K> finalParams = params;
@@ -142,7 +147,9 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
             BoundingBox bb = SpimHelpers.getBb(binfo);
 
             log.setStatus(TimeLabel.DataLoaded);
+
             RandomAccessibleInterval result = application.blockTask(sp, finalParams, bb);
+
             log.setStatus(TimeLabel.FinishProcess);
             logger.blockLog(blockID, " Got processed image");
             N5Writer writer = supplier.getN5Output();

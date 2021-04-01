@@ -32,7 +32,7 @@ public class AWSXmlIoSpimData2<S extends AbstractSequenceDescription<?, ?, ?>, T
         io = new XmlIoSpimData2("");
         this.params = Params.get();
         AWSCredentialInstance.init(params.getCredentialPath());
-        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, params.getBucketName());
+        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, params.getBucketName(),params.getPath());
         awsio = new AWSSpimLoader(S3BucketInstance.get(), params.getPath(), params.getXmlFile());
 
     }
