@@ -85,8 +85,8 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
     @Override
     public Void call() throws Exception {
         AWSCredentialInstance.initWithKey(credPublicKey,credPrivateKey);
-        File logFile = new File("/Users/Marwan/Desktop/log_" + jobId + ".txt");
-        File sparkLog = new File("/Users/Marwan/Desktop/log_spark_" + jobId + ".txt");
+        File logFile = new File("log_" + jobId + ".txt");
+        File sparkLog = new File("log_spark_" + jobId + ".txt");
         logger.info("Starting Main app ..");
         LogAccumulator accumulator = new LogAccumulator(logFile.getAbsolutePath());
         TaskLog mainLog = new TaskLog(-1);

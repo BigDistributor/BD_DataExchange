@@ -2,40 +2,93 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>com.bigdistributor</groupId>
-        <artifactId>AWS_DataExchange</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <artifactId>BigDistributor-pom</artifactId>
+        <version>0.3</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.bigdistributor</groupId>
     <artifactId>BigDistributor_AWS</artifactId>
-    <version>${parent.version}</version>
+    <version>${revision}</version>
 
     <name>Big Distributor AWS</name>
     <description>AWS Related functions for BigDistributor</description>
 
-    <properties>
-        <n5-aws-s3.version>3.2.0</n5-aws-s3.version>
-        <spark-core_2.11.version>2.4.7</spark-core_2.11.version>
-        <aws-java-sdk-sqs.version>1.11.950</aws-java-sdk-sqs.version>
-        <aws-java-sdk-lambda.version>1.11.950</aws-java-sdk-lambda.version>
-    </properties>
-
     <dependencies>
+        <dependency>
+            <groupId>com.bigdistributor</groupId>
+            <artifactId>BigDistributor-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bigdistributor</groupId>
+            <artifactId>AWS_DataExchange</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
             <version>${spark-core_2.11.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty-all</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+
+                <exclusion>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jul-to-slf4j</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aopalliance-repackaged</artifactId>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax.inject</artifactId>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jersey-client</artifactId>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>lz4</artifactId>
+                    <groupId>net.jpountz.lz4</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jets3t</artifactId>
+                    <groupId>net.java.dev.jets3t</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!--        N5-->
+        <dependency>
+            <groupId>org.janelia.saalfeldlab</groupId>
+            <artifactId>n5</artifactId>
+            <version>${n5.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.janelia.saalfeldlab</groupId>
             <artifactId>n5-aws-s3</artifactId>
             <version>${n5-aws-s3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.janelia.saalfeldlab</groupId>
+                    <artifactId>n5</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sqs -->
         <dependency>
