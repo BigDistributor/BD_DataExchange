@@ -1,7 +1,7 @@
 package com.bigdistributor.aws.spimloader;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
+import com.bigdistributor.aws.data.S3Utils;
 import com.bigdistributor.core.spim.SpimDataLoader;
 import com.bigdistributor.io.TempFolder;
 import mpicbg.spim.data.SpimDataException;
@@ -13,38 +13,23 @@ import java.io.File;
 public class AWSSpimLoader implements SpimDataLoader {
 
     private final AmazonS3 s3;
-    private final String path;
-    private final String fileName;
-    private final String bucketname;
-    //    private Document doc;
+    private final String uri;
     private File localFile;
 
-    public AWSSpimLoader(AmazonS3 s3, String bucketName, String path, String fileName) {
+    public AWSSpimLoader(AmazonS3 s3, String uri) {
         this.s3 = s3;
-        this.bucketname = bucketName;
-        this.path = path;
-        this.fileName = fileName;
+        this.uri = uri;
 //        ImgLoaders.registerManually(XmlIoAWSSpimImageLoader.class);
-    }
-
-    public AWSSpimLoader(S3BucketInstance instance, String path, String fileName) {
-        this(instance.getS3(), instance.getBucketName(), path, fileName);
-    }
-
-    public String getFile() {
-        return fileName;
     }
 
     public SpimData2 getSpimdata() {
         try {
-            S3BucketInstance.get().download(TempFolder.get(), fileName, path).getAbsolutePath();
-//            s3.downloadFrom(tmpFolder, params.getPath(), params.getExtraFiles());
+            this.localFile = S3Utils.download(s3,TempFolder.get(),uri);
 
 //            S3BucketInstance.get().downloadFrom(TempFolder.get(), path, new String[]{fileName, "interpolations"});
-            this.localFile = new File(TempFolder.get(), fileName);
             return new XmlIoSpimData2("").load(localFile.getAbsolutePath());
 
-        } catch (IllegalAccessException | SpimDataException e) {
+        } catch (SpimDataException e) {
             e.printStackTrace();
         }
         return null;

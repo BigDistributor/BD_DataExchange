@@ -1,9 +1,10 @@
 package com.bigdistributor.aws.job.spark;
 
-import com.amazonaws.regions.Regions;
-import com.bigdistributor.aws.dataexchange.aws.s3.func.auth.AWSCredentialInstance;
+import com.amazonaws.services.s3.AmazonS3;
+import com.bigdistributor.aws.data.AWSN5Supplier;
+import com.bigdistributor.aws.data.CredentialSupplier;
+import com.bigdistributor.aws.data.S3Utils;
 import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
-import com.bigdistributor.aws.dataexchange.aws.s3.func.read.AWSReader;
 import com.bigdistributor.aws.job.utils.LogAccumulator;
 import com.bigdistributor.aws.job.utils.TaskLog;
 import com.bigdistributor.aws.job.utils.TimeLabel;
@@ -13,14 +14,15 @@ import com.bigdistributor.biglogger.adapters.LoggerManager;
 import com.bigdistributor.core.app.ApplicationMode;
 import com.bigdistributor.core.app.BigDistributorApp;
 import com.bigdistributor.core.app.BigDistributorMainApp;
+import com.bigdistributor.core.metadata.MetadataGenerator;
 import com.bigdistributor.core.task.BlockTask;
 import com.bigdistributor.core.task.JobID;
 import com.bigdistributor.core.task.items.Metadata;
 import com.bigdistributor.core.task.items.SerializableParams;
-import com.bigdistributor.io.mvrecon.SpimHelpers;
 import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.NativeType;
+import net.imglib2.util.Util;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;
 import org.apache.spark.SparkConf;
@@ -31,7 +33,6 @@ import org.janelia.saalfeldlab.n5.DatasetAttributes;
 import org.janelia.saalfeldlab.n5.GzipCompression;
 import org.janelia.saalfeldlab.n5.N5Writer;
 import org.janelia.saalfeldlab.n5.imglib2.N5Utils;
-import org.janelia.saalfeldlab.n5.s3.N5AmazonS3Writer;
 import picocli.CommandLine.Option;
 
 import java.io.File;
@@ -43,17 +44,14 @@ import java.util.concurrent.Callable;
 // K: Task Param
 @BigDistributorApp(mode = ApplicationMode.ExecutionNode)
 public class AWSSparkDistributor<T extends NativeType<T>, K extends SerializableParams> extends BigDistributorMainApp implements Callable<Void> {
-    @Option(names = {"-o", "--output"}, required = true, description = "The path of the output Data")
+    @Option(names = {"-o", "--output"}, required = true, description = "The 3 uri of the output Data, e.g. s3://bucket/output.n5/ ")
     String output;
 
-    @Option(names = {"-i", "--input"}, required = true, description = "The path of the input Data inside bucket")
+    @Option(names = {"-i", "--input"}, required = true, description = "The s3 uri of the input Data, e.g. s3://bucket/dataset.xml ")
     String input;
 
-    @Option(names = {"-p", "--path"}, required = true, description = "The path of the input Data inside bucket")
-    String path;
-
-    @Option(names = {"-b", "--bucket"}, required = true, description = "The name of bucket")
-    String bucketName;
+    @Option(names = {"-po", "--path"}, required = false, description = "The path of the input Data inside bucket, e.g. volumes/raw")
+    String dataset = "/volumes/raw";
 
     @Option(names = {"-pk", "--publicKey"}, required = false, description = "Credential public key")
     String credPublicKey;
@@ -64,11 +62,17 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
     @Option(names = {"-id", "--jobid"}, required = true, description = "The jod Id")
     String jobId;
 
-    @Option(names = {"-m", "--metadata"}, required = true, description = "The path of the MetaData file")
+    @Option(names = {"-m", "--metadata"}, required = false, description = "The s3 uri of the MetaData file, e.g. s3://bucket/metadata.json ")
     String metadataPath;
 
-    @Option(names = {"-p", "--param"}, required = false, description = "The path of the params file")
+    @Option(names = {"-p", "--param"}, required = false, description = "The se uri of the params file, e.g. s3://bucket/params.json ")
     String paramPath;
+
+    @Option(names = "--blockSize", required = false, description = "Size of output blocks, e.g. 128,128,64 or 512,512 (default: as listed before)")
+    private String blockSizeString = null;
+    private int[] blockSize;
+    private static int[] defaultBlockSize2d = new int[]{512, 512};
+    private static int[] defaultBlockSize3d = new int[]{128, 128, 64};
 
 
     private static final Log logger = Log.getLogger(AWSSparkDistributor.class.getSimpleName());
@@ -76,7 +80,6 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
     private Class<BlockTask> mainTask;
 
     private Metadata md;
-    private static String dataset = "/volumes/raw";
 
     public AWSSparkDistributor(Class<BlockTask> task) {
         this.mainTask = task;
@@ -84,47 +87,62 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
 
     @Override
     public Void call() throws Exception {
-        AWSCredentialInstance.initWithKey(credPublicKey,credPrivateKey);
+
+        SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+
+        logger.info("Starting Main app ..");
+        CredentialSupplier credSupplier = new CredentialSupplier(credPublicKey,credPrivateKey);
+        AmazonS3 s3 = credSupplier.getS3();
+//        initCredentials();
+
         File logFile = new File("log_" + jobId + ".txt");
         File sparkLog = new File("log_spark_" + jobId + ".txt");
-        logger.info("Starting Main app ..");
+
         LogAccumulator accumulator = new LogAccumulator(logFile.getAbsolutePath());
         TaskLog mainLog = new TaskLog(-1);
         mainLog.setStatus(TimeLabel.TaskStarted);
         JobID.set(jobId);
 
-        initCredentials();
-
         logger.info("App Id: " + jobId);
 
         LoggerManager.initLoggers();
-        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName,path);
-
-        md = Metadata.fromJsonString(new AWSReader(S3BucketInstance.get(), "", metadataPath).get());
-        logger.info("Got metadata !");
-        if (md == null) {
-            logger.error("Error metadata file !");
-            return null;
+//        S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, bucketName, path);
+        SpimLoadSupplier inputSupplier = new SpimLoadSupplier(credSupplier, input);
+        if (metadataPath != null) {
+            md = Metadata.fromJsonString(S3Utils.get(s3,metadataPath));
+            logger.info("Got metadata !");
+            if (md == null) {
+                logger.error("Error metadata file !");
+                return null;
+            }
+        }else{
+            if (this.blockSizeString == null) {
+                   this.blockSize = defaultBlockSize3d.clone();
+            } else {
+                this.blockSize = new int[defaultBlockSize3d.length];
+                parseCSIntArray(blockSizeString, blockSize);
+            }
+            md = new MetadataGenerator(inputSupplier.getLoader().getSpimdata()).generate().getMetadata();
         }
+
+        Interval interval = md.getBb();
+        long[] blocksizes = md.getBlocksize();
 
         logger.info(JobID.get() + " started!");
         SerializableParams<K> params = null;
         if (paramPath != null)
             try {
-                params = new SerializableParams<K>().fromJsonString(new AWSReader(S3BucketInstance.get(), "", paramPath).get());
+                params = new SerializableParams<K>().fromJsonString(S3Utils.get(s3,paramPath));
             } catch (Exception e) {
                 logger.error("Invalid params: " + e.toString());
             }
         BlockTask application = mainTask.newInstance();
-        SpimLoadSupplier supplier = new SpimLoadSupplier(credPublicKey, credPrivateKey, bucketName, input, output);
-
-        SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).setMaster("local").set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
 
         mainLog.setStatus(TimeLabel.DataLoaded);
-        N5Writer n5 = new N5AmazonS3Writer(S3BucketInstance.get().getS3(), bucketName, output);
+        AWSN5Supplier n5OutputSupplier = new AWSN5Supplier(output,credSupplier);
 
-        createOutput(n5, md);
+        createOutput(n5OutputSupplier.getWriter(), interval,blocksizes);
 
         mainLog.setStatus(TimeLabel.OutputCreated);
         accumulator.append(mainLog.toString());
@@ -143,8 +161,8 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
             Log logger = Log.getLogger("Block: " + blockID);
             logger.blockStarted(blockID, " start processing..");
 
-            SpimData2 sp = supplier.getLoader().getSpimdata();
-            BoundingBox bb = SpimHelpers.getBb(binfo);
+            SpimData2 sp = inputSupplier.getLoader().getSpimdata();
+            BoundingBox bb =  new BoundingBox(Util.long2int(binfo.getMin()), Util.long2int(binfo.getMax()));
 
             log.setStatus(TimeLabel.DataLoaded);
 
@@ -152,7 +170,7 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
 
             log.setStatus(TimeLabel.FinishProcess);
             logger.blockLog(blockID, " Got processed image");
-            N5Writer writer = supplier.getN5Output();
+            N5Writer writer = n5OutputSupplier.getWriter();
             N5Utils.saveBlock(result, writer, dataset, binfo.getGridOffset());
             log.setStatus(TimeLabel.DataSaved);
             logger.blockDone(blockID, " Task done.");
@@ -166,18 +184,9 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
         return null;
     }
 
-    private void initCredentials() {
-        if (credPrivateKey != null && credPublicKey != null) {
-            logger.info("Init credentials with keys ..");
-            AWSCredentialInstance.initWithKey(credPublicKey, credPrivateKey);
-        } else {
-            logger.error("No credentials provided, set to default, this can affect functionalities! ");
-        }
-    }
-
-    private void createOutput(N5Writer n5, Metadata md) throws IOException {
-        long[] dims = dimensionsAsLongArray(md.getBb());
-        int[] blockSize = Arrays.stream(md.getBlocksize()).mapToInt(i -> (int) i).toArray();
+    private void createOutput(N5Writer n5, Interval interval, long[] blocksizes) throws IOException {
+        long[] dims = dimensionsAsLongArray(interval);
+        int[] blockSize = Arrays.stream(blocksizes).mapToInt(i -> (int) i).toArray();
         final DatasetAttributes attributes = new DatasetAttributes(
                 dims,
                 blockSize,
@@ -192,5 +201,19 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
         return dims;
     }
 
+    protected static final boolean parseCSIntArray(final String csv, final int[] array) {
+
+        final String[] stringValues = csv.split(",");
+        if (stringValues.length != array.length)
+            return false;
+        try {
+            for (int i = 0; i < array.length; ++i)
+                array[i] = Integer.parseInt(stringValues[i]);
+        } catch (final NumberFormatException e) {
+            e.printStackTrace(System.err);
+            return false;
+        }
+        return true;
+    }
 }
 
