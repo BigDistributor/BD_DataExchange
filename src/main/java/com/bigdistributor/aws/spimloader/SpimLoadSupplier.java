@@ -16,7 +16,7 @@ public class SpimLoadSupplier implements Serializable {
     }
 
     public AWSSpimLoader getLoader() {
-        return new AWSSpimLoader(getS3(), input);
+        return AWSSpimLoader.init(getS3(), input);
     }
 
     public AmazonS3 getS3() {

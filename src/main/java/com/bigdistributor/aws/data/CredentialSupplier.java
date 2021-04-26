@@ -12,10 +12,22 @@ import java.io.Serializable;
 public class CredentialSupplier implements Serializable {
     private final String credPublicKey;
     private final String credPrivateKey;
+    private final String region;
 
-    public CredentialSupplier(String credPublicKey, String credPrivateKey) {
+    public CredentialSupplier(String credPublicKey, String credPrivateKey){
+        this(credPublicKey,credPrivateKey,"eu-central-1");
+    }
+
+
+    public static CredentialSupplier get(){
+        return CredentialConfig.get();
+    }
+
+    public CredentialSupplier(String credPublicKey, String credPrivateKey, String region) {
         this.credPublicKey = credPublicKey;
         this.credPrivateKey = credPrivateKey;
+        this.region = region;
+        CredentialConfig.set(this);
     }
 
     public AWSCredentials getCredentials() {
@@ -26,11 +38,22 @@ public class CredentialSupplier implements Serializable {
     }
 
     public AmazonS3 getS3() {
+        Regions s3Region = Regions.fromName(region);
+        System.out.println("Region: "+s3Region.getName());
         return AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(getCredentials()))
-                .withRegion(Regions.US_EAST_1)
+                .withRegion(s3Region)
                 .build();
 
+    }
+
+    @Override
+    public String toString() {
+        return "CredentialSupplier{" +
+                "credPublicKey='" + credPublicKey + '\'' +
+                ", credPrivateKey='" + credPrivateKey + '\'' +
+                ", region='" + region + '\'' +
+                '}';
     }
 }

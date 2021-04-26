@@ -17,7 +17,7 @@ public class TestLoader {
 
         S3BucketInstance.init(AWSCredentialInstance.get(), Regions.EU_CENTRAL_1, AWS_DEFAULT.bucket_name,"big/");
 
-        AWSSpimLoader loader = new AWSSpimLoader(S3BucketInstance.get(), "big/", "dataset.xml");
+        AWSSpimLoader loader = AWSSpimLoader.init(S3BucketInstance.get().getS3(), "s3://mzouink-test/big/dataset.xml");
         SpimData2 data = loader.getSpimdata();
         System.out.println(data.toString());
     }

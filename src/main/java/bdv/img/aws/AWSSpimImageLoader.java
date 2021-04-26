@@ -7,7 +7,9 @@ import bdv.img.cache.SimpleCacheArrayLoader;
 import bdv.img.cache.VolatileGlobalCellCache;
 import bdv.util.ConstantRandomAccessible;
 import bdv.util.MipmapTransforms;
-import com.bigdistributor.aws.dataexchange.aws.s3.func.bucket.S3BucketInstance;
+import com.amazonaws.services.s3.AmazonS3URI;
+import com.bigdistributor.aws.data.CredentialSupplier;
+import com.bigdistributor.aws.spimloader.AWSSpimLoader;
 import mpicbg.spim.data.generic.sequence.AbstractSequenceDescription;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
 import mpicbg.spim.data.generic.sequence.ImgLoaderHint;
@@ -85,10 +87,9 @@ public class AWSSpimImageLoader implements ViewerImgLoader, MultiResolutionImgLo
 
                 try
                 {
-                    String path = S3BucketInstance.get().getPath();
-                    String file = path.isEmpty() ? n5File.getName() : new File(path, n5File.getName()).getPath();
-                    System.out.println("N5 file = "+file);
-                    this.n5 = new N5AmazonS3Reader(S3BucketInstance.get().getS3(), S3BucketInstance.get().getBucketName(),file);
+                    String uri = AWSSpimLoader.get().getFileUri(n5File.getName());
+                    System.out.println("N5 file = "+uri);
+                    this.n5 = new N5AmazonS3Reader(CredentialSupplier.get().getS3(), new AmazonS3URI(uri));
 
 //                    this.n5 = new N5FSReader( n5File.getAbsolutePath() );
 
@@ -107,7 +108,7 @@ public class AWSSpimImageLoader implements ViewerImgLoader, MultiResolutionImgLo
                     fetchers = new FetcherThreads( queue, numFetcherThreads );
                     cache = new VolatileGlobalCellCache( queue );
                 }
-                catch (IOException | IllegalAccessException e )
+                catch (IOException e )
                 {
                     throw new RuntimeException( e );
                 }

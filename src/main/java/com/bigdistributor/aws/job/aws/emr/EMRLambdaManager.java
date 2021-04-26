@@ -52,7 +52,7 @@ private final static String LAMBDA_FUNCTION_NAME = "EMRDistributorManager";
     }
 
     public static void main(String[] args) throws IllegalAccessException {
-        EMRLambdaManagerParams params = new EMRLambdaManagerParams("s3://mzouink-test/bigdistributor_tasks-0.2-SNAPSHOT-jar-with-dependencies.jar","helloFromJava",new JarParams("fusion","testJobId","mzouink-test","dataset-n5.xml","new_output.n5","metadata.xml","",AWSCredentialInstance.get()),3);
+        EMRLambdaManagerParams params = new EMRLambdaManagerParams("s3://mzouink-test/bigdistributor_tasks-0.2-SNAPSHOT-jar-with-dependencies.jar","helloFromJava",new JarParams("fusion","testJobId","dataset-n5.xml","new_output.n5","metadata.xml","",AWSCredentialInstance.get()),3);
         AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
 
         AWSCredentials credentials_profile = AWSCredentialInstance.get();
