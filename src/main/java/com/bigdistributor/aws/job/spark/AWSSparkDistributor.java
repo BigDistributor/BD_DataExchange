@@ -14,7 +14,7 @@ import com.bigdistributor.biglogger.adapters.LoggerManager;
 import com.bigdistributor.core.app.ApplicationMode;
 import com.bigdistributor.core.app.BigDistributorApp;
 import com.bigdistributor.core.app.BigDistributorMainApp;
-import com.bigdistributor.tasks.core.metadata.MetadataGenerator;
+import com.bigdistributor.core.metadata.MetadataGenerator;
 import com.bigdistributor.core.task.BlockTask;
 import com.bigdistributor.core.task.JobID;
 import com.bigdistributor.core.task.items.Metadata;
