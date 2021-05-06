@@ -28,6 +28,7 @@
  */
 package bdv.img.aws;
 
+import com.bigdistributor.aws.spimloader.AWSSpimLoader;
 import mpicbg.spim.data.XmlHelpers;
 import mpicbg.spim.data.generic.sequence.AbstractSequenceDescription;
 import mpicbg.spim.data.generic.sequence.ImgLoaderIo;
@@ -57,7 +58,9 @@ public class XmlIoAWSSpimImageLoader implements XmlIoBasicImgLoader<AWSSpimImage
     public AWSSpimImageLoader fromXml(final Element elem, final File basePath, final AbstractSequenceDescription< ?, ?, ? > sequenceDescription )
     {
 //		final String version = elem.getAttributeValue( "version" );
-        final File path = loadPath( elem, "n5", basePath );
-        return new AWSSpimImageLoader( path, sequenceDescription );
+        final File n5File = loadPath( elem, "n5", basePath );
+        String uri = AWSSpimLoader.get().getFileUri(n5File.getName());
+        AWSSpimLoader.get().setN5Uri(uri);
+        return new AWSSpimImageLoader( n5File, sequenceDescription );
     }
 }

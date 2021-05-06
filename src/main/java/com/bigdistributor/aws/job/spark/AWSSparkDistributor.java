@@ -14,7 +14,7 @@ import com.bigdistributor.biglogger.adapters.LoggerManager;
 import com.bigdistributor.core.app.ApplicationMode;
 import com.bigdistributor.core.app.BigDistributorApp;
 import com.bigdistributor.core.app.BigDistributorMainApp;
-import com.bigdistributor.core.metadata.MetadataGenerator;
+import com.bigdistributor.tasks.core.metadata.MetadataGenerator;
 import com.bigdistributor.core.task.BlockTask;
 import com.bigdistributor.core.task.JobID;
 import com.bigdistributor.core.task.items.Metadata;
@@ -91,7 +91,7 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
     @Override
     public Void call() throws Exception {
 
-        SparkConf sparkConf = new SparkConf().setMaster("local").setAppName(JobID.get()).set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        SparkConf sparkConf = new SparkConf().setAppName(JobID.get()).set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
         logger.info("Starting Main app ..");
         final CredentialSupplier credSupplier = new CredentialSupplier(credPublicKey, credPrivateKey,region);
@@ -159,13 +159,14 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
         final String inputUri = input;
         final String outputDataset = dataset;
         final BlockTask application = mainTask.newInstance();
-        sparkContext.parallelize(md.getBlocksInfo()).foreach(binfo -> {
+        sparkContext.parallelize(md.getBlocksInfo(), md.getTotalBlocks()).foreach(binfo -> {
 
             int blockID = binfo.getBlockId();
-            TaskLog log = new TaskLog(blockID);
-            log.setStatus(TimeLabel.TaskStarted);
-            Log logger = Log.getLogger("Block: " + blockID);
-            logger.blockStarted(blockID, " start processing..");
+            System.out.println("Block "+blockID + " started ..");
+//            TaskLog log = new TaskLog(blockID);
+//            log.setStatus(TimeLabel.TaskStarted);
+//            Log logger = Log.getLogger("Block: " + blockID);
+//            logger.blockStarted(blockID, " start processing..");
 
             SpimData2 sp =  new SpimLoadSupplier(credSupplier, inputUri).getLoader().getSpimdata();
             BoundingBox bb = new BoundingBox(Util.long2int(binfo.getMin()), Util.long2int(binfo.getMax()));
@@ -174,15 +175,17 @@ public class AWSSparkDistributor<T extends NativeType<T>, K extends Serializable
 
             RandomAccessibleInterval result = application.blockTask(sp, finalParams, bb);
 
-            log.setStatus(TimeLabel.FinishProcess);
-            logger.blockLog(blockID, " Got processed image");
+//            log.setStatus(TimeLabel.FinishProcess);
+//            logger.blockLog(blockID, " Got processed image");
             AWSN5Supplier instanceOutputSupplier = new AWSN5Supplier(outputUri, credSupplier);
 
             N5Writer writer = instanceOutputSupplier.getWriter();
             N5Utils.saveBlock(result , writer, outputDataset, binfo.getGridOffset());
-            log.setStatus(TimeLabel.DataSaved);
-            logger.blockDone(blockID, " Task done.");
-            log.setStatus(TimeLabel.FinishProcess);
+//            log.setStatus(TimeLabel.DataSaved);
+//            logger.blockDone(blockID, " Task done.");
+//            log.setStatus(TimeLabel.FinishProcess);
+
+            System.out.println("Block "+blockID + " done !");
         });
 
         mainLog.setStatus(TimeLabel.TaskDone);

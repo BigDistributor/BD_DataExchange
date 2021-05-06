@@ -87,7 +87,8 @@ public class AWSSpimImageLoader implements ViewerImgLoader, MultiResolutionImgLo
 
                 try
                 {
-                    String uri = AWSSpimLoader.get().getFileUri(n5File.getName());
+                    String uri = AWSSpimLoader.get().getN5uri();
+
                     System.out.println("N5 file = "+uri);
                     this.n5 = new N5AmazonS3Reader(CredentialSupplier.get().getS3(), new AmazonS3URI(uri));
 

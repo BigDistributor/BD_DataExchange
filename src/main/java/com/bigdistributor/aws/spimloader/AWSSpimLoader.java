@@ -19,6 +19,7 @@ public class AWSSpimLoader implements SpimDataLoader {
     private final AmazonS3 s3;
     private final String uri;
     private File localFile;
+    private String n5uri;
 
     private AWSSpimLoader(AmazonS3 s3, String uri) {
         this.s3 = s3;
@@ -61,5 +62,14 @@ public class AWSSpimLoader implements SpimDataLoader {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void setN5Uri(String uri) {
+        System.out.println("N5 uri: "+uri);
+        this.n5uri = uri;
+    }
+
+    public String getN5uri() {
+        return n5uri;
     }
 }
