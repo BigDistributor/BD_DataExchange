@@ -18,16 +18,28 @@ public class AWSSpimLoader implements SpimDataLoader {
 
     private final AmazonS3 s3;
     private final String uri;
+    private final String[] extras;
     private File localFile;
     private String n5uri;
 
-    private AWSSpimLoader(AmazonS3 s3, String uri) {
+    private AWSSpimLoader(AmazonS3 s3, String uri, String[] extras) {
         this.s3 = s3;
         this.uri = uri;
+        this.extras = extras;
         ImgLoaders.registerManually(XmlIoAWSSpimImageLoader.class);
     }
 
     public static AWSSpimLoader get() {
+        return instance;
+    }
+
+    public static AWSSpimLoader init(AmazonS3 s3, String uri) {
+        instance = new AWSSpimLoader(s3, uri,new String[]{});
+        return instance;
+    }
+
+    public static AWSSpimLoader init(AmazonS3 s3, String uri, String[] extras) {
+        instance = new AWSSpimLoader(s3, uri,extras);
         return instance;
     }
 
@@ -46,10 +58,7 @@ public class AWSSpimLoader implements SpimDataLoader {
         return updatedUri;
     }
 
-    public static AWSSpimLoader init(AmazonS3 s3, String uri) {
-        instance = new AWSSpimLoader(s3, uri);
-        return instance;
-    }
+
 
     public SpimData2 getSpimdata() {
         try {

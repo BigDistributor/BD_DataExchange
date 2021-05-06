@@ -1,0 +1,48 @@
+{
+  "dimensions": {
+    "x": [
+      4.5e-10,
+      "m"
+    ],
+    "y": [
+      4.5e-10,
+      "m"
+    ],
+    "z": [
+      2e-9,
+      "m"
+    ]
+  },
+  "position": [
+    260.9415283203125,
+    294.1377258300781,
+    43.560123443603516
+  ],
+  "crossSectionScale": 1,
+  "projectionScale": 512,
+  "layers": [
+    {
+      "type": "image",
+      "source": "n5://https://mzouink-test.s3.amazonaws.com/dataset.n5/setup0/timepoint0/s0",
+      "tab": "source",
+      "shaderControls": {
+        "normalized": {
+          "range": [
+            0,
+            240
+          ],
+          "window": [
+            0,
+            240
+          ]
+        }
+      },
+      "name": "new layer"
+    }
+  ],
+  "selectedLayer": {
+    "layer": "new layer",
+    "visible": true
+  },
+  "layout": "4panel"
+}
